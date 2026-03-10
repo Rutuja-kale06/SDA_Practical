@@ -1,0 +1,59 @@
+# A.	SVM with Linear Kernel
+
+# Import libraries
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Load dataset
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.2, random_state=42
+
+)
+
+# Linear SVM
+svm_linear = SVC(kernel='linear', C=1)
+svm_linear.fit(X_train, y_train)
+
+# Prediction
+y_pred_linear = svm_linear.predict(X_test)
+
+# Evaluation
+print("Linear SVM Accuracy:", accuracy_score(y_test, y_pred_linear))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_linear))
+
+
+# B.	SVM with RBF Kernel
+
+# RBF SVM
+svm_rbf = SVC(kernel='rbf', C=1, gamma=0.1)
+svm_rbf.fit(X_train, y_train)
+
+# Prediction
+y_pred_rbf = svm_rbf.predict(X_test)
+
+# Evaluation
+print("RBF SVM Accuracy:", accuracy_score(y_test, y_pred_rbf))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_rbf))
+
+
+C.	Hyperparameter Tuning using GridSearchCV
+
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+'C': [0.1, 1, 10],
+'gamma': [0.01, 0.1, 1]
+
+}
+
+grid = GridSearchCV(SVC(kernel='rbf'), param_grid, cv=5)
+grid.fit(X_train, y_train)
+
+print("Best Parameters:", grid.best_params_)
