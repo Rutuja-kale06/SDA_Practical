@@ -1,0 +1,50 @@
+# Import libraries
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Download stopwords (run once)
+nltk.download('stopwords', quiet=True)
+
+# --- Load a real dataset: SMS Spam Collection Dataset ---
+# The dataset can be found at: https://archive.ics.uci.edu/ml/datasets/SMS+Spam+Collection
+# I will download it directly.
+
+# URL of the raw dataset
+dataset_url = 'https://raw.githubusercontent.com/amankharwal/SMS-Spam-Detection/master/spam.csv'
+data = pd.read_csv(dataset_url, encoding='latin-1')
+
+# Rename columns for clarity and drop unnecessary ones
+data = data.iloc[:, :2] # Keep only the first two columns
+data.columns = ['label', 'message']
+
+# Convert labels to binary (ham: 0, spam: 1)
+data['label'] = data['label'].map({'ham': 0, 'spam': 1})
+
+# TF-IDF Vectorization
+tfidf = TfidfVectorizer(stop_words=stopwords.words('english'))
+X = tfidf.fit_transform(data['message'])
+y = data['label']
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.3, random_state=42
+)
+
+# Train Naive Bayes classifier
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+# Prediction
+y_pred = model.predict(X_test)
+
+# Evaluation
+accuracy = accuracy_score(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Confusion Matrix:\n", cm)
